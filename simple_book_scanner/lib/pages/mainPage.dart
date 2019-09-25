@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
-import 'functions/getBookFunctions.dart';
-import 'favoritesPage.dart';
+import '../functions/getBookFunctions.dart';
+import 'package:simple_book_scanner/pages/favoritesPage.dart';
+
+/*
+
+This is the very first page of the app. 
+It contains a Scaffold with an AppBar with 
+"Simple Book Scanner" as title. Contains two big buttons,
+one to go to the FavoritesPage, the other to open the camera
+and scan the book's barcode.
+
+*/
 
 class MainPage extends StatefulWidget {
   @override
@@ -35,6 +45,8 @@ class _MainPageState extends State<MainPage> {
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                //this button takes to the FavoritesPage,
+                //that shows a list of the favorites books.
                 new MaterialButton(
                   onPressed: () {
                     Navigator.push(
@@ -47,7 +59,6 @@ class _MainPageState extends State<MainPage> {
                     Icons.favorite,
                     size: MediaQuery.of(context).size.width * 0.3,
                   ),
-
                 ),
                 Text(
                   "Go to favorites list",
@@ -66,10 +77,11 @@ class _MainPageState extends State<MainPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               new MaterialButton(
+                //this button opens the camera to start scanning the book
                 onPressed: () async {
+                  //these two functions are written in functions/getBookFunctions.dart
                   String bookCode = await scanBarcode(context);
-                  if(bookCode != null)
-                    openBookInfos(bookCode, context);
+                  if (bookCode != null) openBookInfos(bookCode, context);
                 },
                 child: new Icon(
                   Icons.book,
@@ -92,7 +104,4 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-
-
-
 }

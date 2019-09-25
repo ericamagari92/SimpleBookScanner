@@ -1,12 +1,24 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'database.dart';
-import 'book.dart';
+import 'package:simple_book_scanner/databaseManager/database.dart';
+import '../book/book.dart';
+
+/*
+
+This page show the available informations about a book
+(scanned or from the favorites' list).
+Contains a Scaffold with an AppBar.
+The title of the AppBar is the book's code.
+A floatingActionButton is displayed if the informations
+are taken via barcode scan, to add the book to the favorites.
+If the informations are taken from the database,
+the book is already a favorite so the button is not created.
+
+*/
 
 class BookPage extends StatefulWidget {
   final Book book;
+  //bool that defines if the floatingActionButton must be
+  //created or not.
   final bool canBeFavorite;
 
   BookPage({this.book, this.canBeFavorite});
@@ -28,15 +40,18 @@ class _BookPageState extends State<BookPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //create the button according to the bool value
       floatingActionButton: widget.canBeFavorite
           ? FloatingActionButton(
               onPressed: () async {
                 setState(() {
+                  //change the appearence of the button
                   isFavorite = !isFavorite;
                 });
-
+                //add the book to the favorite's database
                 bool result = await DBProvider.db.addFavorite(widget.book);
-                if(result == null) {
+                if (result == null) {
+                  //problem with creating or opening the database
                   showDialog(
                       context: context,
                       builder: (context) {
@@ -45,8 +60,7 @@ class _BookPageState extends State<BookPage> {
                           content: Text("Impossible to create database!"),
                         );
                       });
-                }
-                else if (result==true) {
+                } else if (result == true) {
                   showDialog(
                       context: context,
                       builder: (context) {
@@ -55,8 +69,8 @@ class _BookPageState extends State<BookPage> {
                           content: Text("Book added to favorites!"),
                         );
                       });
-                } else if(result==false){
-
+                } else if (result == false) {
+                  //the book is already in the favorites' list
                   showDialog(
                       context: context,
                       builder: (context) {
@@ -72,6 +86,7 @@ class _BookPageState extends State<BookPage> {
           : new Container(),
       appBar: new AppBar(
         title: Text(
+          //the code of the book
           widget.book.code,
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
@@ -83,6 +98,7 @@ class _BookPageState extends State<BookPage> {
         ),
       ),
       body: new ListView(
+        //this ListView shows all the informations about the book
         physics: BouncingScrollPhysics(),
         children: <Widget>[
           new Column(

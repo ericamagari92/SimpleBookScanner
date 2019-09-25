@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:simple_book_scanner/mainPage.dart';
+import 'package:simple_book_scanner/pages/mainPage.dart';
 
 void main() => runApp(MyApp());
 

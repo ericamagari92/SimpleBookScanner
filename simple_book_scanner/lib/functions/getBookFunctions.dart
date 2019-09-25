@@ -5,18 +5,26 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../book.dart';
-import '../bookPage.dart';
+import 'package:simple_book_scanner/book/book.dart';
+import 'package:simple_book_scanner/pages/bookPage.dart';
 
+/*
 
+Helper functions to get informations about the book 
+from OpenLibrary, scanning the barcode.
+
+*/
+
+//send an HTTP get request to get the informations of the scanned book
+//from OpenLibrary
 Future<void> openBookInfos(String code, BuildContext context) async {
   //add try
   try {
-    http.get(
-        'https://openlibrary.org/api/books?bibkeys=ISBN:$code&format=json&jscmd=data')
+    http
+        .get(
+            'https://openlibrary.org/api/books?bibkeys=ISBN:$code&format=json&jscmd=data')
         .then((response) {
-      //print(response.body);
-      //String body=response.body;
+      //decode the response in JSON format
       Map<String, dynamic> bookInfos = jsonDecode(response.body);
       String isbn = "ISBN:$code";
 
@@ -24,6 +32,7 @@ Future<void> openBookInfos(String code, BuildContext context) async {
       List<String> publishers = new List<String>();
 
       if (bookInfos[isbn] == null) {
+        //the book is not found in the database of OpenLibrary
         showDialog(
             context: context,
             builder: (context) {
@@ -37,46 +46,49 @@ Future<void> openBookInfos(String code, BuildContext context) async {
 
       if (bookInfos[isbn]["authors"] != null) {
         for (Map<String, dynamic> element in bookInfos[isbn]["authors"]) {
-          print(element["name"]);
+          //save a list of authors
           authors.add(element["name"]);
         }
       }
       if (bookInfos[isbn]["publishers"] != null) {
         for (Map<String, dynamic> element in bookInfos[isbn]["publishers"]) {
+          //save a list of publishers
           publishers.add(element["name"]);
         }
       }
-
+      //create a Book (book/book.dart).
+      //List fields are transformed to strings with the
+      //_buildString function, written below
       Book book = new Book(
           code: code,
           title: bookInfos[isbn]["title"] ?? "?",
           publishers: _buildString(publishers),
           publish_date: bookInfos[isbn]["publish_date"] ?? "?",
-          authors: _buildString(authors)
-      );
+          authors: _buildString(authors));
+      //open BookPage to show received informations
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  BookPage(
+              builder: (BuildContext context) => BookPage(
                     book: book,
                     canBeFavorite: true,
                   )));
     });
   } catch (e) {
-
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text("Error!"),
-            content: Text("Something went wrong with the connection to OperLibrary!"),
+            content: Text(
+                "Something went wrong with the connection to OperLibrary!"),
           );
         });
-   // return false;
+    // return false;
   }
 }
 
+//build a string given a list of strings
 String _buildString(List<String> stringList) {
   var result = StringBuffer();
   int listLen = stringList.length - 1;
@@ -92,32 +104,35 @@ String _buildString(List<String> stringList) {
   return result.toString();
 }
 
+//this function opens the camera after checked the camera permission
+//and scans a barcode. It returns the barcode as a string
 Future<String> scanBarcode(BuildContext context) async {
   try {
     String barcode = await BarcodeScanner.scan();
     return barcode;
   } on PlatformException catch (e) {
+    //request the camera permissions
     if (e.code == BarcodeScanner.CameraAccessDenied) {
       final Future<PermissionStatus> statusFuture = PermissionHandler()
           .checkPermissionStatus(PermissionGroup.camera)
           .then((PermissionStatus status) async {
         if (status != PermissionStatus.granted) {
-          final List<PermissionGroup> permissions =
-          new List<PermissionGroup>();
+          final List<PermissionGroup> permissions = new List<PermissionGroup>();
           permissions.add(PermissionGroup.camera);
-          final Map<PermissionGroup, PermissionStatus>
-          permissionRequestResult =
-          await PermissionHandler().requestPermissions(permissions);
+          final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
+              await PermissionHandler().requestPermissions(permissions);
           PermissionHandler()
               .checkPermissionStatus(PermissionGroup.camera)
-              .then((PermissionStatus status)  {
+              .then((PermissionStatus status) {
             if (status != PermissionStatus.granted) {
+              //the user did not accept the camera permission
               showDialog(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
                       title: Text("Error!"),
-                      content: Text("Please to use the scanner accept the camera permission!"),
+                      content: Text(
+                          "Please to use the scanner accept the camera permission!"),
                     );
                   });
               return null;
@@ -129,7 +144,7 @@ Future<String> scanBarcode(BuildContext context) async {
     return null;
   } on FormatException catch (e) {
     print(
-        'null (User returned using the "back"-button before scanning anything. Result)');
+        "User returned using the \"back\"-button before scanning anything. Result");
     return null;
   } catch (e) {
     print('Unknown error: $e');
