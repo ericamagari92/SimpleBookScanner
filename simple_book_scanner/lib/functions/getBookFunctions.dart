@@ -111,36 +111,8 @@ Future<String> scanBarcode(BuildContext context) async {
     String barcode = await BarcodeScanner.scan();
     return barcode;
   } on PlatformException catch (e) {
-    //request the camera permissions
-    if (e.code == BarcodeScanner.CameraAccessDenied) {
-      final Future<PermissionStatus> statusFuture = PermissionHandler()
-          .checkPermissionStatus(PermissionGroup.camera)
-          .then((PermissionStatus status) async {
-        if (status != PermissionStatus.granted) {
-          final List<PermissionGroup> permissions = new List<PermissionGroup>();
-          permissions.add(PermissionGroup.camera);
-          final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
-              await PermissionHandler().requestPermissions(permissions);
-          PermissionHandler()
-              .checkPermissionStatus(PermissionGroup.camera)
-              .then((PermissionStatus status) {
-            if (status != PermissionStatus.granted) {
-              //the user did not accept the camera permission
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text("Error!"),
-                      content: Text(
-                          "Please to use the scanner accept the camera permission!"),
-                    );
-                  });
-              return null;
-            }
-          });
-        }
-      });
-    }
+    //appears a dialog to request the camera permissions
+    //if the user says "No" it returns null;
     return null;
   } on FormatException catch (e) {
     print(

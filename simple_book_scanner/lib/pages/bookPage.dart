@@ -119,7 +119,7 @@ class _BookPageState extends State<BookPage> {
                 padding: EdgeInsets.only(top: 10.0, left: 15.0),
                 child: Text(
                   widget.book.authors != "?"
-                      ? widget.book.authors
+                      ? widget.book.authors.replaceAll("_", " ").replaceAll("&", ", ")
                       : "No authors informations is available for this book",
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -145,7 +145,7 @@ class _BookPageState extends State<BookPage> {
                 padding: EdgeInsets.only(top: 10.0, left: 15.0),
                 child: Text(
                   widget.book.title != "?"
-                      ? widget.book.title
+                      ? widget.book.title.replaceAll("_", " ")
                       : "No title information is available for this book",
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -171,7 +171,7 @@ class _BookPageState extends State<BookPage> {
                 padding: EdgeInsets.only(top: 10.0, left: 15.0),
                 child: Text(
                   widget.book.publishers != "?"
-                      ? widget.book.publishers
+                      ? widget.book.publishers.replaceAll("_", " ").replaceAll("&", ", ")
                       : "No publishers informations is available for this book",
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,

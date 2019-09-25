@@ -104,7 +104,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                                   0.7,
                                               child: Text(
                                                 //the title of the book
-                                                books[index].title,
+                                                books[index].title.replaceAll("_", " "),
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 1,
                                                 style: TextStyle(
