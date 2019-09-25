@@ -13,3 +13,5 @@ BookPage:
 Lists the informations about a book.
 If the book is taken from a scan, a floatingActionButton appears.
 this button allows the user to add the book to the favorites table in the database.
+
+Flutter version used: 1.7.8+hotfix.4-stable
